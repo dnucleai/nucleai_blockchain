@@ -5,10 +5,17 @@ from torch.multiprocessing import Process
 from web3.auto.infura import w3 # Should work without Infura API key
 # Otherwise, obtain a key and export INFURA_API_KEY=...
 
+# Alternatively if you have your own local node:
+# from web3 import Web3
+# w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
+# Or:
+# from web3 import Web3
+# web3 = Web3(Web3.IPCProvider("~/Library/Ethereum/geth.ipc"))
 
-# Mostly adapted from code at https://pytorch.org/tutorials/intermediate/dist_tuto.html
-# torch.distributed API documentation: https://pytorch.org/docs/stable/distributed.html
-# web3 documentation (used to retreive ethereum blockchain data): 
+
+# References:
+# https://pytorch.org/tutorials/intermediate/dist_tuto.html
+# https://pytorch.org/docs/stable/distributed.html
 # https://web3py.readthedocs.io/en/stable/quickstart.html
 
 
@@ -36,6 +43,7 @@ def run(rank, size):
         # Receive tensor from process 0
         dist.recv(tensor=tensor, src=0)
 
+        # Send tensor back to process 1
         dist.send(tensor=tensor, dst=0)
 
     print('Rank ', rank, ' has block number: ', tensor[0].item())
@@ -45,6 +53,7 @@ def run(rank, size):
 
 def init_processes(rank, size, fn, backend='tcp'):
     """ Initialize the distributed environment. """
+
     # These environment variables must be set on all machines running distributed code
     # MASTER_ADDR and MASTER_PORT should be set to those of the rank 0 machine
     os.environ['MASTER_ADDR'] = '127.0.0.1'
