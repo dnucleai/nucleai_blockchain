@@ -20,10 +20,12 @@ def run(rank, size):
     if rank == 0:
         # Retrieving ethereum block data and wrapping it in a tensor
         block_data = w3.eth.getBlock('latest')
+
+        # Convert the hash string to ASCII so that the tensor can encode it (No strings)
         ascii_hash = [ord(c) for c in block_data.hash.hex()]
         print("Original hash: ", block_data.hash.hex())
         tensor = torch.tensor([block_data.number, block_data.timestamp] + ascii_hash)
-        
+
         # Send the tensor to process 1
         dist.send(tensor=tensor, dst=1)
         
