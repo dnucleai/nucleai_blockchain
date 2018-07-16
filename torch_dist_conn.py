@@ -43,7 +43,7 @@ def run(rank, size):
         # Receive tensor from process 0
         dist.recv(tensor=tensor, src=0)
 
-        # Send tensor back to process 1
+        # Send tensor back to process 0
         dist.send(tensor=tensor, dst=0)
 
     print('Rank ', rank, ' has block number: ', tensor[0].item())
