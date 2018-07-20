@@ -5,6 +5,7 @@ package nucleai;
 // I want to keep everything here request-response, no streaming!
 // This limitation makes infrastructure easier down the road.
 
+message Void {}
 
 message Event {
     int32 secondsFromNow = 1;

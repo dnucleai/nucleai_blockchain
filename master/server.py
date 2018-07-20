@@ -89,7 +89,7 @@ class LearningServicer(pb_grpc.LearningServicer):
     def __init__(self):
         pass
 
-    def _try(self, f):
+    def _try(self, f, context):
         try:
             ret = f()
             return ret
@@ -99,31 +99,33 @@ class LearningServicer(pb_grpc.LearningServicer):
                 log.warn("Invalid input from client, exception: {}".format(e))
                 context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
                 context.set_details(repr(e))
+                return pb.Void()
             else:
                 # our fault
                 log.error("unexpected exception: {}".format(e))
                 context.set_code(grpc.StatusCode.ABORTED)
                 context.set_details(repr("internal error"))
+                return pb.Void()
 
 
     def Enqueue(self, request, context):
         def f():
             log.info("Client {} enqueued".format(request.clientId.txt))
             return pb.EnqueueResponse(waitTime=pb.Event(secondsFromNow=global_learner.clock))
-        return self._try(f)
+        return self._try(f, context)
 
     def Download(self, request, context):
         def f():
             log.debug("Client {} downloading".format(request.clientId.txt))
             return pb.DownloadResponse(parameters=global_learner.download())
-        return self._try(f)
+        return self._try(f, context)
 
     def Upload(self, request, context):
         def f():
             log.debug("Client {} uploading".format(request.clientId.txt))
             global_learner.upload(request.deltas)
             return pb.UploadResponse()
-        return self._try(f)
+        return self._try(f, context)
 
 
 def run():
