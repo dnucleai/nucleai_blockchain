@@ -122,7 +122,7 @@ class LearningServicer(pb_grpc.LearningServicer):
         def f():
             log.debug("Client {} uploading".format(request.clientId.txt))
             global_learner.upload(request.deltas)
-        return pb.UploadResponse()
+            return pb.UploadResponse()
         return self._try(f)
 
 
