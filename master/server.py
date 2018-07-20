@@ -89,20 +89,41 @@ class LearningServicer(pb_grpc.LearningServicer):
     def __init__(self):
         pass
 
-    # TODO error handling at outermost layer
+    def _try(self, f):
+        try:
+            ret = f()
+            return ret
+        except Exception as e:
+            if isinstance(e, Learner.Exception):
+                # bad input, not our fault
+                log.warn("Invalid input from client, exception: {}".format(e))
+                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                context.set_details(repr(e))
+            else:
+                # our fault
+                log.error("unexpected exception: {}".format(e))
+                context.set_code(grpc.StatusCode.ABORTED)
+                context.set_details(repr("internal error"))
+
 
     def Enqueue(self, request, context):
-        log.info("Client {} enqueued".format(request.clientId.txt))
-        return pb.EnqueueResponse(waitTime=pb.Event(secondsFromNow=global_learner.clock))
+        def f():
+            log.info("Client {} enqueued".format(request.clientId.txt))
+            return pb.EnqueueResponse(waitTime=pb.Event(secondsFromNow=global_learner.clock))
+        return self._try(f)
 
     def Download(self, request, context):
-        log.debug("Client {} downloading".format(request.clientId.txt))
-        return pb.DownloadResponse(parameters=global_learner.download())
+        def f():
+            log.debug("Client {} downloading".format(request.clientId.txt))
+            return pb.DownloadResponse(parameters=global_learner.download())
+        return self._try(f)
 
     def Upload(self, request, context):
-        log.debug("Client {} uploading".format(request.clientId.txt))
-        global_learner.upload(request.deltas)
+        def f():
+            log.debug("Client {} uploading".format(request.clientId.txt))
+            global_learner.upload(request.deltas)
         return pb.UploadResponse()
+        return self._try(f)
 
 
 def run():
