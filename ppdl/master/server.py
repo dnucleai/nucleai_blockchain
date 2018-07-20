@@ -79,6 +79,8 @@ class Learner:
         # download a random subset of the weights
         weights = [pb.IndexedValue(index=i, value=val) for i, val in random.sample(list(self.weights.items()), int(len(self.weights) * self.dropout_ratio))]
         log.debug("all weights = {}, weights being downloaded = {}".format(self.weights, weights))
+        if self.phase != PHASE_TRAIN: # check again, 2-phase commit style
+            raise self.Exception("cannot download except in the training phase")
         return pb.Parameters(weights=weights)
 
 
