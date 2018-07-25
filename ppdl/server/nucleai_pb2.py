@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='nucleai.proto',
   package='nucleai',
   syntax='proto3',
-  serialized_pb=_b('\n\rnucleai.proto\x12\x07nucleai\"\x06\n\x04Void\"\x1f\n\x05\x45vent\x12\x16\n\x0esecondsFromNow\x18\x01 \x01(\x05\"\x17\n\x08\x43lientId\x12\x0b\n\x03txt\x18\x01 \x01(\t\",\n\x0cIndexedValue\x12\r\n\x05index\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\x01\"[\n\nParameters\x12&\n\x07weights\x18\x01 \x03(\x0b\x32\x15.nucleai.IndexedValue\x12%\n\x06\x62iases\x18\x02 \x03(\x0b\x32\x15.nucleai.IndexedValue\"2\n\x06\x44\x65ltas\x12(\n\tgradients\x18\x01 \x03(\x0b\x32\x15.nucleai.IndexedValue\"5\n\x0e\x45nqueueRequest\x12#\n\x08\x63lientId\x18\x01 \x01(\x0b\x32\x11.nucleai.ClientId\"3\n\x0f\x45nqueueResponse\x12 \n\x08waitTime\x18\x01 \x01(\x0b\x32\x0e.nucleai.Event\"6\n\x0f\x44ownloadRequest\x12#\n\x08\x63lientId\x18\x01 \x01(\x0b\x32\x11.nucleai.ClientId\";\n\x10\x44ownloadResponse\x12\'\n\nparameters\x18\x01 \x01(\x0b\x32\x13.nucleai.Parameters\"U\n\rUploadRequest\x12#\n\x08\x63lientId\x18\x01 \x01(\x0b\x32\x11.nucleai.ClientId\x12\x1f\n\x06\x64\x65ltas\x18\x02 \x01(\x0b\x32\x0f.nucleai.Deltas\"\x10\n\x0eUploadResponse2\xca\x01\n\x08Learning\x12>\n\x07\x45nqueue\x12\x17.nucleai.EnqueueRequest\x1a\x18.nucleai.EnqueueResponse\"\x00\x12\x41\n\x08\x44ownload\x12\x18.nucleai.DownloadRequest\x1a\x19.nucleai.DownloadResponse\"\x00\x12;\n\x06Upload\x12\x16.nucleai.UploadRequest\x1a\x17.nucleai.UploadResponse\"\x00\x62\x06proto3')
+  serialized_pb=_b('\n\rnucleai.proto\x12\x07nucleai\"\x06\n\x04Void\"\x1f\n\x05\x45vent\x12\x16\n\x0esecondsFromNow\x18\x01 \x01(\x05\"\x17\n\x08\x43lientId\x12\x0b\n\x03txt\x18\x01 \x01(\t\"\x16\n\x07\x43ycleId\x12\x0b\n\x03num\x18\x01 \x01(\x03\",\n\x0cIndexedValue\x12\r\n\x05index\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\x01\"7\n\nParameters\x12)\n\nparameters\x18\x01 \x03(\x0b\x32\x15.nucleai.IndexedValue\"6\n\x0f\x44ownloadRequest\x12#\n\x08\x63lientId\x18\x01 \x01(\x0b\x32\x11.nucleai.ClientId\"\x80\x01\n\x10\x44ownloadResponse\x12!\n\x07\x63ycleId\x18\x01 \x01(\x0b\x32\x10.nucleai.CycleId\x12 \n\x08waitTime\x18\x02 \x01(\x0b\x32\x0e.nucleai.Event\x12\'\n\nparameters\x18\x03 \x01(\x0b\x32\x13.nucleai.Parameters\"|\n\rUploadRequest\x12!\n\x07\x63ycleId\x18\x01 \x01(\x0b\x32\x10.nucleai.CycleId\x12#\n\x08\x63lientId\x18\x02 \x01(\x0b\x32\x11.nucleai.ClientId\x12#\n\x06\x64\x65ltas\x18\x03 \x01(\x0b\x32\x13.nucleai.Parameters\"\x10\n\x0eUploadResponse2\x8a\x01\n\x08Learning\x12\x41\n\x08\x44ownload\x12\x18.nucleai.DownloadRequest\x1a\x19.nucleai.DownloadResponse\"\x00\x12;\n\x06Upload\x12\x16.nucleai.UploadRequest\x1a\x17.nucleai.UploadResponse\"\x00\x62\x06proto3')
 )
 
 
@@ -111,6 +111,37 @@ _CLIENTID = _descriptor.Descriptor(
 )
 
 
+_CYCLEID = _descriptor.Descriptor(
+  name='CycleId',
+  full_name='nucleai.CycleId',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='num', full_name='nucleai.CycleId.num', index=0,
+      number=1, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=92,
+  serialized_end=114,
+)
+
+
 _INDEXEDVALUE = _descriptor.Descriptor(
   name='IndexedValue',
   full_name='nucleai.IndexedValue',
@@ -144,8 +175,8 @@ _INDEXEDVALUE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=92,
-  serialized_end=136,
+  serialized_start=116,
+  serialized_end=160,
 )
 
 
@@ -157,45 +188,7 @@ _PARAMETERS = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='weights', full_name='nucleai.Parameters.weights', index=0,
-      number=1, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='biases', full_name='nucleai.Parameters.biases', index=1,
-      number=2, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=138,
-  serialized_end=229,
-)
-
-
-_DELTAS = _descriptor.Descriptor(
-  name='Deltas',
-  full_name='nucleai.Deltas',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='gradients', full_name='nucleai.Deltas.gradients', index=0,
+      name='parameters', full_name='nucleai.Parameters.parameters', index=0,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -213,70 +206,8 @@ _DELTAS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=231,
-  serialized_end=281,
-)
-
-
-_ENQUEUEREQUEST = _descriptor.Descriptor(
-  name='EnqueueRequest',
-  full_name='nucleai.EnqueueRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='clientId', full_name='nucleai.EnqueueRequest.clientId', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=283,
-  serialized_end=336,
-)
-
-
-_ENQUEUERESPONSE = _descriptor.Descriptor(
-  name='EnqueueResponse',
-  full_name='nucleai.EnqueueResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='waitTime', full_name='nucleai.EnqueueResponse.waitTime', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=338,
-  serialized_end=389,
+  serialized_start=162,
+  serialized_end=217,
 )
 
 
@@ -306,8 +237,8 @@ _DOWNLOADREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=391,
-  serialized_end=445,
+  serialized_start=219,
+  serialized_end=273,
 )
 
 
@@ -319,8 +250,22 @@ _DOWNLOADRESPONSE = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='parameters', full_name='nucleai.DownloadResponse.parameters', index=0,
+      name='cycleId', full_name='nucleai.DownloadResponse.cycleId', index=0,
       number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='waitTime', full_name='nucleai.DownloadResponse.waitTime', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='parameters', full_name='nucleai.DownloadResponse.parameters', index=2,
+      number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -337,8 +282,8 @@ _DOWNLOADRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=447,
-  serialized_end=506,
+  serialized_start=276,
+  serialized_end=404,
 )
 
 
@@ -350,15 +295,22 @@ _UPLOADREQUEST = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='clientId', full_name='nucleai.UploadRequest.clientId', index=0,
+      name='cycleId', full_name='nucleai.UploadRequest.cycleId', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='deltas', full_name='nucleai.UploadRequest.deltas', index=1,
+      name='clientId', full_name='nucleai.UploadRequest.clientId', index=1,
       number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='deltas', full_name='nucleai.UploadRequest.deltas', index=2,
+      number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -375,8 +327,8 @@ _UPLOADREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=508,
-  serialized_end=593,
+  serialized_start=406,
+  serialized_end=530,
 )
 
 
@@ -399,27 +351,24 @@ _UPLOADRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=595,
-  serialized_end=611,
+  serialized_start=532,
+  serialized_end=548,
 )
 
-_PARAMETERS.fields_by_name['weights'].message_type = _INDEXEDVALUE
-_PARAMETERS.fields_by_name['biases'].message_type = _INDEXEDVALUE
-_DELTAS.fields_by_name['gradients'].message_type = _INDEXEDVALUE
-_ENQUEUEREQUEST.fields_by_name['clientId'].message_type = _CLIENTID
-_ENQUEUERESPONSE.fields_by_name['waitTime'].message_type = _EVENT
+_PARAMETERS.fields_by_name['parameters'].message_type = _INDEXEDVALUE
 _DOWNLOADREQUEST.fields_by_name['clientId'].message_type = _CLIENTID
+_DOWNLOADRESPONSE.fields_by_name['cycleId'].message_type = _CYCLEID
+_DOWNLOADRESPONSE.fields_by_name['waitTime'].message_type = _EVENT
 _DOWNLOADRESPONSE.fields_by_name['parameters'].message_type = _PARAMETERS
+_UPLOADREQUEST.fields_by_name['cycleId'].message_type = _CYCLEID
 _UPLOADREQUEST.fields_by_name['clientId'].message_type = _CLIENTID
-_UPLOADREQUEST.fields_by_name['deltas'].message_type = _DELTAS
+_UPLOADREQUEST.fields_by_name['deltas'].message_type = _PARAMETERS
 DESCRIPTOR.message_types_by_name['Void'] = _VOID
 DESCRIPTOR.message_types_by_name['Event'] = _EVENT
 DESCRIPTOR.message_types_by_name['ClientId'] = _CLIENTID
+DESCRIPTOR.message_types_by_name['CycleId'] = _CYCLEID
 DESCRIPTOR.message_types_by_name['IndexedValue'] = _INDEXEDVALUE
 DESCRIPTOR.message_types_by_name['Parameters'] = _PARAMETERS
-DESCRIPTOR.message_types_by_name['Deltas'] = _DELTAS
-DESCRIPTOR.message_types_by_name['EnqueueRequest'] = _ENQUEUEREQUEST
-DESCRIPTOR.message_types_by_name['EnqueueResponse'] = _ENQUEUERESPONSE
 DESCRIPTOR.message_types_by_name['DownloadRequest'] = _DOWNLOADREQUEST
 DESCRIPTOR.message_types_by_name['DownloadResponse'] = _DOWNLOADRESPONSE
 DESCRIPTOR.message_types_by_name['UploadRequest'] = _UPLOADREQUEST
@@ -447,6 +396,13 @@ ClientId = _reflection.GeneratedProtocolMessageType('ClientId', (_message.Messag
   ))
 _sym_db.RegisterMessage(ClientId)
 
+CycleId = _reflection.GeneratedProtocolMessageType('CycleId', (_message.Message,), dict(
+  DESCRIPTOR = _CYCLEID,
+  __module__ = 'nucleai_pb2'
+  # @@protoc_insertion_point(class_scope:nucleai.CycleId)
+  ))
+_sym_db.RegisterMessage(CycleId)
+
 IndexedValue = _reflection.GeneratedProtocolMessageType('IndexedValue', (_message.Message,), dict(
   DESCRIPTOR = _INDEXEDVALUE,
   __module__ = 'nucleai_pb2'
@@ -460,27 +416,6 @@ Parameters = _reflection.GeneratedProtocolMessageType('Parameters', (_message.Me
   # @@protoc_insertion_point(class_scope:nucleai.Parameters)
   ))
 _sym_db.RegisterMessage(Parameters)
-
-Deltas = _reflection.GeneratedProtocolMessageType('Deltas', (_message.Message,), dict(
-  DESCRIPTOR = _DELTAS,
-  __module__ = 'nucleai_pb2'
-  # @@protoc_insertion_point(class_scope:nucleai.Deltas)
-  ))
-_sym_db.RegisterMessage(Deltas)
-
-EnqueueRequest = _reflection.GeneratedProtocolMessageType('EnqueueRequest', (_message.Message,), dict(
-  DESCRIPTOR = _ENQUEUEREQUEST,
-  __module__ = 'nucleai_pb2'
-  # @@protoc_insertion_point(class_scope:nucleai.EnqueueRequest)
-  ))
-_sym_db.RegisterMessage(EnqueueRequest)
-
-EnqueueResponse = _reflection.GeneratedProtocolMessageType('EnqueueResponse', (_message.Message,), dict(
-  DESCRIPTOR = _ENQUEUERESPONSE,
-  __module__ = 'nucleai_pb2'
-  # @@protoc_insertion_point(class_scope:nucleai.EnqueueResponse)
-  ))
-_sym_db.RegisterMessage(EnqueueResponse)
 
 DownloadRequest = _reflection.GeneratedProtocolMessageType('DownloadRequest', (_message.Message,), dict(
   DESCRIPTOR = _DOWNLOADREQUEST,
@@ -518,22 +453,13 @@ _LEARNING = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   options=None,
-  serialized_start=614,
-  serialized_end=816,
+  serialized_start=551,
+  serialized_end=689,
   methods=[
-  _descriptor.MethodDescriptor(
-    name='Enqueue',
-    full_name='nucleai.Learning.Enqueue',
-    index=0,
-    containing_service=None,
-    input_type=_ENQUEUEREQUEST,
-    output_type=_ENQUEUERESPONSE,
-    options=None,
-  ),
   _descriptor.MethodDescriptor(
     name='Download',
     full_name='nucleai.Learning.Download',
-    index=1,
+    index=0,
     containing_service=None,
     input_type=_DOWNLOADREQUEST,
     output_type=_DOWNLOADRESPONSE,
@@ -542,7 +468,7 @@ _LEARNING = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='Upload',
     full_name='nucleai.Learning.Upload',
-    index=2,
+    index=1,
     containing_service=None,
     input_type=_UPLOADREQUEST,
     output_type=_UPLOADRESPONSE,

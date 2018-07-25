@@ -14,11 +14,9 @@ class Client():
     def get_client_id(self):
         return pb.ClientId(txt=self.id)
 
-    def enqueue(self):
-        return self.stub.Enqueue(pb.EnqueueRequest(clientId=self.get_client_id()))
-
-    def upload(self, deltas):
+    def upload(self, cycle_id, deltas):
         return self.stub.Upload(pb.UploadRequest(
+            cycleId=pb.CycleId(num=cycle_id),
             clientId=self.get_client_id(),
             deltas=deltas,
             ))
@@ -29,10 +27,13 @@ class Client():
 
 if __name__ == "__main__":
     client = Client()
-    print(client.enqueue())
-    print(client.download())
-    print(client.upload(pb.Deltas(gradients=[
-        pb.IndexedValue(index=1, value=1e6),
-        pb.IndexedValue(index=2, value=1e6),
-        ])))
+    dl = client.download()
+    print(dl)
+    print(client.upload(
+        dl.cycleId.num,
+        pb.Parameters(parameters=[
+            pb.IndexedValue(index=1, value=1e6),
+            pb.IndexedValue(index=2, value=1e6),
+            ]
+            )))
 

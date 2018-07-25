@@ -5,8 +5,10 @@ import nucleai_pb2 as nucleai__pb2
 
 
 class LearningStub(object):
-  # missing associated documentation comment in .proto file
-  pass
+  """Service and requests and responses below...
+  I want to keep everything here request-response, no streaming!
+  This limitation makes implementation safer now and scale infrastructure easier down the road.
+  """
 
   def __init__(self, channel):
     """Constructor.
@@ -14,11 +16,6 @@ class LearningStub(object):
     Args:
       channel: A grpc.Channel.
     """
-    self.Enqueue = channel.unary_unary(
-        '/nucleai.Learning/Enqueue',
-        request_serializer=nucleai__pb2.EnqueueRequest.SerializeToString,
-        response_deserializer=nucleai__pb2.EnqueueResponse.FromString,
-        )
     self.Download = channel.unary_unary(
         '/nucleai.Learning/Download',
         request_serializer=nucleai__pb2.DownloadRequest.SerializeToString,
@@ -32,19 +29,17 @@ class LearningStub(object):
 
 
 class LearningServicer(object):
-  # missing associated documentation comment in .proto file
-  pass
-
-  def Enqueue(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
+  """Service and requests and responses below...
+  I want to keep everything here request-response, no streaming!
+  This limitation makes implementation safer now and scale infrastructure easier down the road.
+  """
 
   def Download(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """One cycle = one iteration of clients downloading parameters then uploading deltas
+    The server enforces that each cycle takes a predetermined duration of time.
+    The client must download parameters then upload deltas before the cycle completes, else it's ignored.
+
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
@@ -59,11 +54,6 @@ class LearningServicer(object):
 
 def add_LearningServicer_to_server(servicer, server):
   rpc_method_handlers = {
-      'Enqueue': grpc.unary_unary_rpc_method_handler(
-          servicer.Enqueue,
-          request_deserializer=nucleai__pb2.EnqueueRequest.FromString,
-          response_serializer=nucleai__pb2.EnqueueResponse.SerializeToString,
-      ),
       'Download': grpc.unary_unary_rpc_method_handler(
           servicer.Download,
           request_deserializer=nucleai__pb2.DownloadRequest.FromString,
