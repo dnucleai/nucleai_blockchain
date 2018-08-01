@@ -7,9 +7,11 @@ import nucleai_pb2_grpc as pb_grpc
 from logger import singleton as log
 from concurrent import futures
 import random
-
+from database import Database
 from collections import deque, defaultdict
 
+
+ADMIN_USER = "admin"
 
 PHASE_NONE = 0
 PHASE_TRAIN = 1
@@ -23,25 +25,76 @@ class Learner:
     # private methods are run inside a separate thread
     # public methods interact with that thread safely
 
-    # I use Python native stuff here instead of PyTorch tensors of Numpy arrays
+    # I use Python native arrays here
     #   TODO optimize later if needed 
 
     def __init__(self, initial_parameters_f, starting_cycle_time=15):
-        self.parameters = None
         self.initial_parameters_f = initial_parameters_f
         self.dropout_ratio = 0.25 # fraction of params selected for download and upload
 
-        self.cycle_id = 1
+        self.db = Database()
+        self.job_id = None
+        self.cycle_id = None
         self.cycle_time = starting_cycle_time
         self.clock = None
         self.phase = PHASE_NONE
-        self.upload_q = deque()
         self.thread = threading.Thread(target=self._run_loop)
         self.thread.daemon = True # so the thread halts if the parent halts
 
+        # TODO for now we always create a new job here
+        self._create_job()
+
+    def _create_job(self):
+        self.job_id = self.db.execute("""
+        INSERT INTO ppdl.job (id) VALUES (DEFAULT) RETURNING id;
+        """, returning=True)
+        log.debug("created job with id {}".format(self.job_id))
+        self.db.commit()
+
+    def _create_cycle(self):
+        assert self.job_id is not None
+        self.cycle_id = self.db.execute("""
+        INSERT INTO ppdl.cycle(job_id, starts_at, finishes_at) (
+            SELECT %s, now(), now() + interval '{}' sec
+        ) RETURNING id
+        """.format(self.cycle_time), (self.job_id,), returning=True)
+        log.debug("created cycle with id {}".format(self.cycle_id))
+        self.db.commit()
+
+    def _add_parameters(self, parameters, user_id):
+        # create the upload row
+        upload_id = self.db.execute("""
+        INSERT INTO ppdl.parameters_upload (cycle_id, user_id) (
+            SELECT %s, %s
+        ) RETURNING id
+        """, (self.cycle_id, user_id), returning=True)
+        # create the parameter rows
+        dimensions, values = zip(*parameters.items())
+        self.db.execute("""
+        INSERT INTO ppdl.parameter(upload_id, dimension, value) (
+            SELECT %s, d, v 
+            FROM unnest((%s)::int[], (%s)::float8[]) params(d, v)
+        )
+        """, (upload_id, list(dimensions), list(values)))
+        self.db.commit()
+
+    def _get_parameters(self):
+        # on the fly summation; TODO maybe cache
+        rows = self.db.query("""
+        SELECT p.dimension, sum(p.value)
+        FROM ppdl.parameter p, ppdl.parameters_upload u
+        WHERE p.upload_id = u.id
+        AND u.cycle_id = %s
+        GROUP BY p.dimension
+        """, (self.cycle_id,))
+        self.db.commit()
+        assert rows
+        return {r[0]: r[1] for r in rows}
+
     def _train_phase(self):
         self.phase = PHASE_TRAIN
-        self.parameters = self.initial_parameters_f()
+        parameters = self.initial_parameters_f()
+        self._add_parameters(parameters, ADMIN_USER)
 
         while self.clock > 0:
             time.sleep(1)
@@ -49,29 +102,17 @@ class Learner:
 
     def _update_phase(self):
         self.phase = PHASE_UPDATE
-        uploads = list(self.upload_q)
-        self.upload_q.clear()
-        for upload in uploads:
-            if upload.cycleId.num != self.cycle_id:
-                # it's still possible to get something from the wrong cycle here,
-                #   so ignore it if it happens
-                continue
-            deltas = upload.deltas
-            for delta in deltas.parameters: # TODO it's just SGD for now
-                old = self.parameters[delta.index]
-                self.parameters[delta.index] += delta.value 
-                log.debug("update phase: param {} changed from {} to {}"
-                        .format(delta.index, old, self.parameters[delta.index]))
+        # nothing else to do here yet...	
 
     def _run_loop(self):
         while True:
             log.debug("Starting cycle {}".format(self.cycle_id))
+            self._create_cycle()
             self.clock = self.cycle_time
             log.info("Entering download/train phase")
             self._train_phase()
             log.info("Entering update phase")
             self._update_phase() 
-            self.cycle_id += 1
 
     def start(self):
         self.thread.start()
@@ -81,8 +122,9 @@ class Learner:
         if self.phase != PHASE_TRAIN: # TODO maybe only allow downloads if enough time remaining
             raise self.Exception("cannot download except in the training phase")
         # download a random subset of the parameters
-        parameters = [pb.IndexedValue(index=i, value=val) for i, val in random.sample(list(self.parameters.items()), int(len(self.parameters) * self.dropout_ratio))]
-        log.debug("all parameters = {}, parameters being downloaded = {}".format(self.parameters, parameters))
+        parameters_l = self._get_parameters()
+        parameters = [pb.IndexedValue(index=i, value=val) for i, val in random.sample(list(parameters_l.items()), int(len(parameters_l) * self.dropout_ratio))]
+        log.debug("all parameters = {}, parameters being downloaded = {}".format(parameters_l, parameters))
         parameters = pb.Parameters(parameters=parameters)
         return pb.DownloadResponse(
                 cycleId=pb.CycleId(num=self.cycle_id),
@@ -97,9 +139,8 @@ class Learner:
         if self.cycle_id != request.cycleId.num:
             raise self.Exception("upload is for cycle {}, but server is on cycle {}"
                     .format(request.cycleId.num, self.cycle_id))
-        if len(request.deltas.parameters) != int(len(self.parameters) * self.dropout_ratio):
-            raise self.Exception("too any or too few deltas uploaded")
-        self.upload_q.append(request)
+        parameters = {p.index: p.value for p in request.deltas.parameters}
+        self._add_parameters(parameters, request.clientId.txt)
         return pb.UploadResponse()
 
 
