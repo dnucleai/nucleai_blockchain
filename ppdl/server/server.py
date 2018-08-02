@@ -1,5 +1,6 @@
 import threading
 import time
+import os
 import grpc
 import traceback
 import nucleai_pb2 as pb
@@ -78,23 +79,23 @@ class Learner:
         """, (upload_id, list(dimensions), list(values)))
         self.db.commit()
 
-    def _get_parameters(self):
+    def _get_last_parameters(self):
         # on the fly summation; TODO maybe cache
         rows = self.db.query("""
         SELECT p.dimension, sum(p.value)
-        FROM ppdl.parameter p, ppdl.parameters_upload u
+        FROM ppdl.parameter p, ppdl.parameters_upload u, ppdl.cycle c
         WHERE p.upload_id = u.id
-        AND u.cycle_id = %s
+        AND u.cycle_id < %s
+        AND c.id = u.cycle_id
+        AND c.job_id = %s
         GROUP BY p.dimension
-        """, (self.cycle_id,))
+        """, (self.cycle_id, self.job_id))
         self.db.commit()
         assert rows
         return {r[0]: r[1] for r in rows}
 
     def _train_phase(self):
         self.phase = PHASE_TRAIN
-        parameters = self.initial_parameters_f()
-        self._add_parameters(parameters, ADMIN_USER)
 
         while self.clock > 0:
             time.sleep(1)
@@ -105,6 +106,11 @@ class Learner:
         # nothing else to do here yet...	
 
     def _run_loop(self):
+        # set initial parameters in first cycle
+        self._create_cycle()
+        parameters = self.initial_parameters_f()
+        self._add_parameters(parameters, ADMIN_USER)
+
         while True:
             log.debug("Starting cycle {}".format(self.cycle_id))
             self._create_cycle()
@@ -122,7 +128,7 @@ class Learner:
         if self.phase != PHASE_TRAIN: # TODO maybe only allow downloads if enough time remaining
             raise self.Exception("cannot download except in the training phase")
         # download a random subset of the parameters
-        parameters_l = self._get_parameters()
+        parameters_l = self._get_last_parameters()
         parameters = [pb.IndexedValue(index=i, value=val) for i, val in random.sample(list(parameters_l.items()), int(len(parameters_l) * self.dropout_ratio))]
         log.debug("all parameters = {}, parameters being downloaded = {}".format(parameters_l, parameters))
         parameters = pb.Parameters(parameters=parameters)
@@ -194,7 +200,7 @@ def run():
     # start the gRPC server
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     pb_grpc.add_LearningServicer_to_server(LearningServicer(), server)
-    server.add_insecure_port('[::]:1453')
+    server.add_insecure_port('[::]:{}'.format(os.getenv("PORT") or 1453))
     server.start()
     try:
         while True: # otherwise the script just exits
